@@ -5,7 +5,7 @@ Sistema de inscripciones, asistencia, calificaciones, actas y certificados de **
 **Equipo:** Adolfo Khaled Mendoza Cervantes · Eros Vargas Mariscal · Jesús Enrique García Mendoza · Kevin Armando Vargas Briones
 **Curso:** Componentes de Lógica de Negocio · FIME, UANL · Profesor Miguel Ángel Gómez Marroquín
 
-- Repositorio: https://github.com/yallegoelpayas/edutechacademy_u3_repositorio
+- Repositorio: [https://github.com/yallegoelpayas/edutechacademy_u3_repositorio](https://github.com/AdolfoKhaled/edutech-academy-cln)
 - Sistema desplegado (Swagger): **_pendiente: URL de Render_**/docs
 
 ## Estructura
