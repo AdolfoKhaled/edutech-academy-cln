@@ -1,0 +1,23 @@
+[project]
+name = "edutech-academy-cln"
+version = "1.0.0"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore::ResourceWarning", "ignore::DeprecationWarning", "ignore::pytest.PytestUnraisableExceptionWarning"]
+
+[tool.coverage.run]
+source = ["src"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
+ignore = ["E741"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src", "tests"]

@@ -1,0 +1,2644 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "EduTech Academy · API de lógica de negocio",
+    "description": "PIA de Componentes de Lógica de Negocio (FIME, UANL). Inscripciones, solicitudes, asistencia, calificaciones, actas y certificados con las reglas del BRD de EduTech Academy. Usuarios de demostración para X-Usuario: inst-1 (Instructor), ce-1 (Control Escolar), coord-1 (Coordinación Académica).",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/salud": {
+      "get": {
+        "tags": [
+          "General"
+        ],
+        "summary": "Salud",
+        "operationId": "salud_salud_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/reiniciar": {
+      "post": {
+        "tags": [
+          "General"
+        ],
+        "summary": "Vuelve a cargar los datos del paquete (demostración)",
+        "operationId": "reiniciar_demo_reiniciar_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estudiantes": {
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Estudiantes",
+        "operationId": "estudiantes_estudiantes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EstudianteOut"
+                  },
+                  "type": "array",
+                  "title": "Response Estudiantes Estudiantes Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estudiantes/{estudianteId}": {
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Estudiante",
+        "operationId": "estudiante_estudiantes__estudianteId__get",
+        "parameters": [
+          {
+            "name": "estudianteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Estudianteid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstudianteOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/cursos": {
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Cursos",
+        "operationId": "cursos_cursos_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CursoOut"
+                  },
+                  "type": "array",
+                  "title": "Response Cursos Cursos Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cursos/{cursoId}": {
+      "get": {
+        "tags": [
+          "Catálogo"
+        ],
+        "summary": "Curso",
+        "operationId": "curso_cursos__cursoId__get",
+        "parameters": [
+          {
+            "name": "cursoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Cursoid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CursoOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/solicitudes": {
+      "get": {
+        "tags": [
+          "Solicitudes"
+        ],
+        "summary": "Solicitudes",
+        "operationId": "solicitudes_solicitudes_get",
+        "parameters": [
+          {
+            "name": "estado",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SolicitudOut"
+                  },
+                  "title": "Response Solicitudes Solicitudes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Solicitudes"
+        ],
+        "summary": "Registrar una solicitud (queda en Preinscrito)",
+        "operationId": "registrar_solicitudes_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolicitudIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolicitudConMensaje"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/solicitudes/{solicitudId}": {
+      "get": {
+        "tags": [
+          "Solicitudes"
+        ],
+        "summary": "Solicitud",
+        "operationId": "solicitud_solicitudes__solicitudId__get",
+        "parameters": [
+          {
+            "name": "solicitudId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Solicitudid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolicitudOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/solicitudes/{solicitudId}/evaluacion": {
+      "get": {
+        "tags": [
+          "Solicitudes"
+        ],
+        "summary": "Evaluar las Specifications sin cambiar la solicitud",
+        "operationId": "evaluar_solicitudes__solicitudId__evaluacion_get",
+        "parameters": [
+          {
+            "name": "solicitudId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Solicitudid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluacionOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/solicitudes/{solicitudId}/formalizar": {
+      "post": {
+        "tags": [
+          "Solicitudes"
+        ],
+        "summary": "Preinscrito → Inscrito (reglas + reserva de lugares)",
+        "operationId": "formalizar_solicitudes__solicitudId__formalizar_post",
+        "parameters": [
+          {
+            "name": "solicitudId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Solicitudid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolicitudConMensaje"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/solicitudes/{solicitudId}/concluir": {
+      "post": {
+        "tags": [
+          "Solicitudes"
+        ],
+        "summary": "Inscrito → Concluido",
+        "operationId": "concluir_solicitudes__solicitudId__concluir_post",
+        "parameters": [
+          {
+            "name": "solicitudId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Solicitudid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolicitudConMensaje"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/solicitudes/{solicitudId}/cancelar": {
+      "post": {
+        "tags": [
+          "Solicitudes"
+        ],
+        "summary": "Preinscrito → Liberada",
+        "operationId": "cancelar_solicitudes__solicitudId__cancelar_post",
+        "parameters": [
+          {
+            "name": "solicitudId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Solicitudid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/CancelacionIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Datos"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolicitudConMensaje"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/grupos/{grupoId}/inscripciones": {
+      "post": {
+        "tags": [
+          "CU-01 Inscripción"
+        ],
+        "summary": "Solicitar inscripción: Preinscrito o lista de espera si no hay cupo",
+        "operationId": "inscribir_grupos__grupoId__inscripciones_post",
+        "parameters": [
+          {
+            "name": "grupoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Grupoid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatosContactoIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscripcionOut"
+                }
+              }
+            }
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscripcionOut"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcionId}/pagos": {
+      "post": {
+        "tags": [
+          "CU-01 Inscripción"
+        ],
+        "summary": "Pago acreditado por el sistema contable (50 % formaliza)",
+        "operationId": "pagar_inscripciones__inscripcionId__pagos_post",
+        "parameters": [
+          {
+            "name": "inscripcionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcionid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PagoIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscripcionOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcionId}/estado-de-pago": {
+      "get": {
+        "tags": [
+          "CU-01 Inscripción"
+        ],
+        "summary": "Estado De Pago",
+        "operationId": "estado_de_pago_inscripciones__inscripcionId__estado_de_pago_get",
+        "parameters": [
+          {
+            "name": "inscripcionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcionid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstadoDePagoOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcionId}/vencimiento": {
+      "post": {
+        "tags": [
+          "CU-01 Inscripción"
+        ],
+        "summary": "Revisar el plazo de pago: si venció, libera el lugar y avisa al siguiente",
+        "operationId": "vencimiento_inscripciones__inscripcionId__vencimiento_post",
+        "parameters": [
+          {
+            "name": "inscripcionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcionid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/VencimientoIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Datos"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcionId}/asistencias": {
+      "post": {
+        "tags": [
+          "CU-02 Asistencia"
+        ],
+        "summary": "Asistencia",
+        "operationId": "asistencia_inscripciones__inscripcionId__asistencias_post",
+        "parameters": [
+          {
+            "name": "inscripcionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcionid"
+            }
+          },
+          {
+            "name": "X-Usuario",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Usuario que realiza la acción (rol)",
+              "examples": [
+                "inst-1"
+              ],
+              "title": "X-Usuario"
+            },
+            "description": "Usuario que realiza la acción (rol)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AsistenciaIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/inscripciones/{inscripcionId}/evaluaciones": {
+      "post": {
+        "tags": [
+          "CU-03 Calificaciones"
+        ],
+        "summary": "Evaluacion",
+        "operationId": "evaluacion_inscripciones__inscripcionId__evaluaciones_post",
+        "parameters": [
+          {
+            "name": "inscripcionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inscripcionid"
+            }
+          },
+          {
+            "name": "X-Usuario",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Usuario que realiza la acción (rol)",
+              "examples": [
+                "inst-1"
+              ],
+              "title": "X-Usuario"
+            },
+            "description": "Usuario que realiza la acción (rol)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluacionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/grupos/{grupoId}/acta/cierre": {
+      "post": {
+        "tags": [
+          "CU-04 Acta"
+        ],
+        "summary": "Cerrar Acta",
+        "operationId": "cerrar_acta_grupos__grupoId__acta_cierre_post",
+        "parameters": [
+          {
+            "name": "grupoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Grupoid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/CierreActaIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Datos"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActaOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/certificados": {
+      "post": {
+        "tags": [
+          "CU-05 Certificados"
+        ],
+        "summary": "Emitir",
+        "operationId": "emitir_certificados_post",
+        "parameters": [
+          {
+            "name": "X-Usuario",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Usuario que realiza la acción (rol)",
+              "examples": [
+                "inst-1"
+              ],
+              "title": "X-Usuario"
+            },
+            "description": "Usuario que realiza la acción (rol)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CertificadoIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificadoOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/verificacion/{folio}": {
+      "get": {
+        "tags": [
+          "CU-05 Certificados"
+        ],
+        "summary": "Verificación pública sin credenciales",
+        "operationId": "verificar_verificacion__folio__get",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Folio"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificacionOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mensaje"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActaOut": {
+        "properties": {
+          "grupoId": {
+            "type": "string",
+            "title": "Grupoid"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "fechaCierre": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fechacierre"
+          },
+          "lineas": {
+            "items": {
+              "$ref": "#/components/schemas/LineaActaOut"
+            },
+            "type": "array",
+            "title": "Lineas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "grupoId",
+          "estado",
+          "fechaCierre",
+          "lineas"
+        ],
+        "title": "ActaOut"
+      },
+      "AsistenciaIn": {
+        "properties": {
+          "sesion": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Sesion",
+            "examples": [
+              1
+            ]
+          },
+          "presente": {
+            "type": "boolean",
+            "title": "Presente",
+            "default": true
+          },
+          "ahora": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ahora"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sesion"
+        ],
+        "title": "AsistenciaIn"
+      },
+      "CancelacionIn": {
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "title": "Motivo",
+            "default": "Cancelada por el estudiante",
+            "examples": [
+              "El estudiante cambió de horario"
+            ]
+          }
+        },
+        "type": "object",
+        "title": "CancelacionIn"
+      },
+      "CertificadoIn": {
+        "properties": {
+          "grupoId": {
+            "type": "string",
+            "title": "Grupoid"
+          },
+          "inscripcionId": {
+            "type": "string",
+            "title": "Inscripcionid"
+          },
+          "hoy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hoy"
+          }
+        },
+        "type": "object",
+        "required": [
+          "grupoId",
+          "inscripcionId"
+        ],
+        "title": "CertificadoIn"
+      },
+      "CertificadoOut": {
+        "properties": {
+          "folio": {
+            "type": "string",
+            "title": "Folio"
+          },
+          "titular": {
+            "type": "string",
+            "title": "Titular"
+          },
+          "curso": {
+            "type": "string",
+            "title": "Curso"
+          },
+          "fechaConclusion": {
+            "type": "string",
+            "format": "date",
+            "title": "Fechaconclusion"
+          },
+          "codigoQr": {
+            "type": "string",
+            "title": "Codigoqr"
+          },
+          "dentroDePlazo": {
+            "type": "boolean",
+            "title": "Dentrodeplazo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "folio",
+          "titular",
+          "curso",
+          "fechaConclusion",
+          "codigoQr",
+          "dentroDePlazo"
+        ],
+        "title": "CertificadoOut"
+      },
+      "CierreActaIn": {
+        "properties": {
+          "hoy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hoy"
+          }
+        },
+        "type": "object",
+        "title": "CierreActaIn"
+      },
+      "CursoOut": {
+        "properties": {
+          "cursoId": {
+            "type": "string",
+            "title": "Cursoid"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "modalidad": {
+            "type": "string",
+            "title": "Modalidad"
+          },
+          "precio": {
+            "type": "string",
+            "title": "Precio"
+          },
+          "habilitado": {
+            "type": "boolean",
+            "title": "Habilitado"
+          },
+          "grupoId": {
+            "type": "string",
+            "title": "Grupoid"
+          },
+          "cupo": {
+            "type": "integer",
+            "title": "Cupo"
+          },
+          "ocupados": {
+            "type": "integer",
+            "title": "Ocupados"
+          },
+          "disponibles": {
+            "type": "integer",
+            "title": "Disponibles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cursoId",
+          "nombre",
+          "modalidad",
+          "precio",
+          "habilitado",
+          "grupoId",
+          "cupo",
+          "ocupados",
+          "disponibles"
+        ],
+        "title": "CursoOut"
+      },
+      "DatosContactoIn": {
+        "properties": {
+          "estudianteId": {
+            "type": "string",
+            "title": "Estudianteid",
+            "examples": [
+              "EDU-C001"
+            ]
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre",
+            "examples": [
+              "Alumno 01"
+            ]
+          },
+          "correo": {
+            "type": "string",
+            "title": "Correo",
+            "examples": [
+              "alumno01@example.com"
+            ]
+          },
+          "telefono": {
+            "type": "string",
+            "title": "Telefono",
+            "examples": [
+              "8100000000"
+            ]
+          },
+          "ahora": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ahora"
+          }
+        },
+        "type": "object",
+        "required": [
+          "estudianteId",
+          "nombre",
+          "correo",
+          "telefono"
+        ],
+        "title": "DatosContactoIn"
+      },
+      "EstadoDePagoOut": {
+        "properties": {
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "saldoPendiente": {
+            "type": "string",
+            "title": "Saldopendiente"
+          },
+          "fechaLimitePago": {
+            "type": "string",
+            "format": "date",
+            "title": "Fechalimitepago"
+          }
+        },
+        "type": "object",
+        "required": [
+          "estado",
+          "saldoPendiente",
+          "fechaLimitePago"
+        ],
+        "title": "EstadoDePagoOut"
+      },
+      "EstudianteOut": {
+        "properties": {
+          "estudianteId": {
+            "type": "string",
+            "title": "Estudianteid"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "preferente": {
+            "type": "boolean",
+            "title": "Preferente"
+          },
+          "activo": {
+            "type": "boolean",
+            "title": "Activo"
+          },
+          "ciudad": {
+            "type": "string",
+            "title": "Ciudad"
+          }
+        },
+        "type": "object",
+        "required": [
+          "estudianteId",
+          "nombre",
+          "preferente",
+          "activo",
+          "ciudad"
+        ],
+        "title": "EstudianteOut"
+      },
+      "EvaluacionIn": {
+        "properties": {
+          "clave": {
+            "type": "string",
+            "title": "Clave",
+            "examples": [
+              "parcial-1"
+            ]
+          },
+          "tipo": {
+            "type": "string",
+            "title": "Tipo",
+            "examples": [
+              "parcial"
+            ]
+          },
+          "valor": {
+            "type": "number",
+            "title": "Valor",
+            "examples": [
+              85
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "clave",
+          "tipo",
+          "valor"
+        ],
+        "title": "EvaluacionIn"
+      },
+      "EvaluacionOut": {
+        "properties": {
+          "solicitudId": {
+            "type": "string",
+            "title": "Solicitudid"
+          },
+          "puedeProcesarse": {
+            "type": "boolean",
+            "title": "Puedeprocesarse"
+          },
+          "motivos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Motivos"
+          },
+          "beneficioReferencia": {
+            "type": "boolean",
+            "title": "Beneficioreferencia"
+          },
+          "total": {
+            "type": "string",
+            "title": "Total"
+          },
+          "reglas": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Reglas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "solicitudId",
+          "puedeProcesarse",
+          "motivos",
+          "beneficioReferencia",
+          "total",
+          "reglas"
+        ],
+        "title": "EvaluacionOut"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "InscripcionOut": {
+        "properties": {
+          "mensaje": {
+            "type": "string",
+            "title": "Mensaje"
+          },
+          "inscripcionId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inscripcionid"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "monto": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monto"
+          },
+          "fechaLimitePago": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fechalimitepago"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mensaje",
+          "estado"
+        ],
+        "title": "InscripcionOut"
+      },
+      "LineaActaOut": {
+        "properties": {
+          "inscripcionId": {
+            "type": "string",
+            "title": "Inscripcionid"
+          },
+          "estudiante": {
+            "type": "string",
+            "title": "Estudiante"
+          },
+          "calificacionFinal": {
+            "type": "number",
+            "title": "Calificacionfinal"
+          },
+          "porcentajeAsistencia": {
+            "type": "number",
+            "title": "Porcentajeasistencia"
+          },
+          "cumple": {
+            "type": "boolean",
+            "title": "Cumple"
+          },
+          "motivo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inscripcionId",
+          "estudiante",
+          "calificacionFinal",
+          "porcentajeAsistencia",
+          "cumple",
+          "motivo"
+        ],
+        "title": "LineaActaOut"
+      },
+      "LineaIn": {
+        "properties": {
+          "cursoId": {
+            "type": "string",
+            "title": "Cursoid",
+            "examples": [
+              "EDU-P001"
+            ]
+          },
+          "lugares": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Lugares",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "cursoId",
+          "lugares"
+        ],
+        "title": "LineaIn"
+      },
+      "LineaOut": {
+        "properties": {
+          "cursoId": {
+            "type": "string",
+            "title": "Cursoid"
+          },
+          "lugares": {
+            "type": "integer",
+            "title": "Lugares"
+          },
+          "precio": {
+            "type": "string",
+            "title": "Precio"
+          },
+          "subtotal": {
+            "type": "string",
+            "title": "Subtotal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cursoId",
+          "lugares",
+          "precio",
+          "subtotal"
+        ],
+        "title": "LineaOut"
+      },
+      "Mensaje": {
+        "properties": {
+          "mensaje": {
+            "type": "string",
+            "title": "Mensaje",
+            "examples": [
+              "No existe EDU-O999 en solicitudes"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "mensaje"
+        ],
+        "title": "Mensaje"
+      },
+      "PagoIn": {
+        "properties": {
+          "monto": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Monto",
+            "examples": [
+              "566.00"
+            ]
+          },
+          "fecha": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha"
+          }
+        },
+        "type": "object",
+        "required": [
+          "monto"
+        ],
+        "title": "PagoIn"
+      },
+      "SolicitudConMensaje": {
+        "properties": {
+          "solicitudId": {
+            "type": "string",
+            "title": "Solicitudid"
+          },
+          "estudianteId": {
+            "type": "string",
+            "title": "Estudianteid"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "fechaSolicitud": {
+            "type": "string",
+            "format": "date",
+            "title": "Fechasolicitud"
+          },
+          "autorizada": {
+            "type": "boolean",
+            "title": "Autorizada"
+          },
+          "promocionActiva": {
+            "type": "boolean",
+            "title": "Promocionactiva"
+          },
+          "lineas": {
+            "items": {
+              "$ref": "#/components/schemas/LineaOut"
+            },
+            "type": "array",
+            "title": "Lineas"
+          },
+          "lugares": {
+            "type": "integer",
+            "title": "Lugares"
+          },
+          "total": {
+            "type": "string",
+            "title": "Total"
+          },
+          "folio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folio"
+          },
+          "motivoLiberacion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivoliberacion"
+          },
+          "accionesPermitidas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Accionespermitidas"
+          },
+          "eventos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Eventos"
+          },
+          "mensaje": {
+            "type": "string",
+            "title": "Mensaje"
+          }
+        },
+        "type": "object",
+        "required": [
+          "solicitudId",
+          "estudianteId",
+          "estado",
+          "fechaSolicitud",
+          "autorizada",
+          "promocionActiva",
+          "lineas",
+          "lugares",
+          "total",
+          "folio",
+          "motivoLiberacion",
+          "accionesPermitidas",
+          "eventos",
+          "mensaje"
+        ],
+        "title": "SolicitudConMensaje"
+      },
+      "SolicitudIn": {
+        "properties": {
+          "estudianteId": {
+            "type": "string",
+            "title": "Estudianteid",
+            "examples": [
+              "EDU-C001"
+            ]
+          },
+          "cursos": {
+            "items": {
+              "$ref": "#/components/schemas/LineaIn"
+            },
+            "type": "array",
+            "title": "Cursos"
+          },
+          "autorizada": {
+            "type": "boolean",
+            "title": "Autorizada",
+            "default": true
+          },
+          "promocionActiva": {
+            "type": "boolean",
+            "title": "Promocionactiva",
+            "default": false
+          },
+          "fecha": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha"
+          }
+        },
+        "type": "object",
+        "required": [
+          "estudianteId",
+          "cursos"
+        ],
+        "title": "SolicitudIn"
+      },
+      "SolicitudOut": {
+        "properties": {
+          "solicitudId": {
+            "type": "string",
+            "title": "Solicitudid"
+          },
+          "estudianteId": {
+            "type": "string",
+            "title": "Estudianteid"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "fechaSolicitud": {
+            "type": "string",
+            "format": "date",
+            "title": "Fechasolicitud"
+          },
+          "autorizada": {
+            "type": "boolean",
+            "title": "Autorizada"
+          },
+          "promocionActiva": {
+            "type": "boolean",
+            "title": "Promocionactiva"
+          },
+          "lineas": {
+            "items": {
+              "$ref": "#/components/schemas/LineaOut"
+            },
+            "type": "array",
+            "title": "Lineas"
+          },
+          "lugares": {
+            "type": "integer",
+            "title": "Lugares"
+          },
+          "total": {
+            "type": "string",
+            "title": "Total"
+          },
+          "folio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folio"
+          },
+          "motivoLiberacion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivoliberacion"
+          },
+          "accionesPermitidas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Accionespermitidas"
+          },
+          "eventos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Eventos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "solicitudId",
+          "estudianteId",
+          "estado",
+          "fechaSolicitud",
+          "autorizada",
+          "promocionActiva",
+          "lineas",
+          "lugares",
+          "total",
+          "folio",
+          "motivoLiberacion",
+          "accionesPermitidas",
+          "eventos"
+        ],
+        "title": "SolicitudOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VencimientoIn": {
+        "properties": {
+          "ahora": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ahora"
+          }
+        },
+        "type": "object",
+        "title": "VencimientoIn"
+      },
+      "VerificacionOut": {
+        "properties": {
+          "titular": {
+            "type": "string",
+            "title": "Titular"
+          },
+          "curso": {
+            "type": "string",
+            "title": "Curso"
+          },
+          "fechaConclusion": {
+            "type": "string",
+            "format": "date",
+            "title": "Fechaconclusion"
+          },
+          "vigencia": {
+            "type": "string",
+            "title": "Vigencia"
+          }
+        },
+        "type": "object",
+        "required": [
+          "titular",
+          "curso",
+          "fechaConclusion",
+          "vigencia"
+        ],
+        "title": "VerificacionOut"
+      }
+    }
+  }
+}
