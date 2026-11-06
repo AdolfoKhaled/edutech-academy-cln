@@ -6,43 +6,46 @@
 sequenceDiagram
     autonumber
     actor Estudiante
-    participant API as API REST (FastAPI)
+    participant API as API REST FastAPI
     participant Servicio as InscripcionService
-    participant Grupo as Grupo (dominio)
-    participant Inscripcion as Inscripcion (dominio)
+    participant Grupo as Grupo dominio
+    participant Inscripcion as Inscripcion dominio
     participant UoW as UnitOfWork y repositorios
     actor Contable as Sistema contable externo
     participant Adapter as SistemaContableAdapter
 
-    Estudiante->>API: POST /grupos/{grupoId}/inscripciones
-    API->>Servicio: solicitarInscripcion(cmd)
+    Estudiante->>API: POST solicitud de inscripcion
+    API->>Servicio: solicitarInscripcion cmd
     Servicio->>UoW: iniciar transaccion
-    Servicio->>Grupo: reservarLugar(inscripcionId)
+    Servicio->>Grupo: reservarLugar inscripcionId
+
     alt Hay cupo disponible
         Grupo-->>Servicio: reserva y fechaLimitePago
-        Servicio->>Inscripcion: preinscribir(datos, costo, fechaLimitePago)
-        Servicio->>UoW: guardar Inscripcion, Expediente y Grupo
+        Servicio->>Inscripcion: preinscribir datos y costo
+        Servicio->>UoW: guardar Inscripcion Expediente y Grupo
         Servicio->>UoW: confirmar transaccion
-        Servicio-->>API: SolicitudRegistrada (Preinscrito)
-        API-->>Estudiante: 201 Created, estado Preinscrito
+        Servicio-->>API: SolicitudRegistrada Preinscrito
+        API-->>Estudiante: 201 Created estado Preinscrito
     else No hay cupo
-        Servicio->>Grupo: agregarAListaDeEspera(estudianteId, fechaHora)
+        Servicio->>Grupo: agregarAListaDeEspera
         Servicio->>UoW: guardar Grupo y confirmar transaccion
         Servicio-->>API: EnListaDeEspera
-        API-->>Estudiante: 202 Accepted, lista de espera
+        API-->>Estudiante: 202 Accepted lista de espera
     end
 
-    opt Cuando el sistema contable acredita un pago
-        Contable->>API: POST /inscripciones/{inscripcionId}/pagos
-        API->>Adapter: pagoNotificado(inscripcionId, monto, fecha)
-        Adapter->>Servicio: acreditarPago(inscripcionId, monto, fecha)
+    opt Sistema contable acredita un pago
+        Contable->>API: POST notificacion de pago
+        API->>Adapter: pagoNotificado
+        Adapter->>Servicio: acreditarPago
         Servicio->>UoW: iniciar transaccion
-        Servicio->>Inscripcion: registrarPago(PagoAcreditado)
+        Servicio->>Inscripcion: registrarPago
+
         alt Pago acumulado alcanza el 50 por ciento
             Inscripcion-->>Servicio: InscripcionFormalizada con folio
         else Pago acumulado menor al 50 por ciento
-            Inscripcion-->>Servicio: abono registrado; estado Preinscrito
+            Inscripcion-->>Servicio: abono registrado y estado Preinscrito
         end
+
         Servicio->>UoW: guardar Inscripcion y confirmar transaccion
         Servicio-->>Adapter: resultado de acreditacion
         Adapter-->>API: resultado de pago
