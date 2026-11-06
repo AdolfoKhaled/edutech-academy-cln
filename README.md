@@ -6,7 +6,8 @@ Sistema de inscripciones, asistencia, calificaciones, actas y certificados de **
 **Curso:** Componentes de Lógica de Negocio · FIME, UANL · Profesor Miguel Ángel Gómez Marroquín
 
 - Repositorio: https://github.com/AdolfoKhaled/edutech-academy-cln
-- Sistema desplegado (Swagger): (https://edutech-academy-api.onrender.com/docs)
+- Panel para el usuario: https://edutech-academy-api.onrender.com/panel
+- API documentada (Swagger): https://edutech-academy-api.onrender.com/docs
 
 ## Estructura
 
@@ -21,7 +22,7 @@ src/
                              Value Objects, Specifications, eventos, errores e interfaces de repositorio
   application/               servicios de aplicación (casos de uso CU-01 a CU-05), Commands y puertos
   infrastructure/            SQLAlchemy (PostgreSQL/SQLite), Unit of Work, adapters y carga de los CSV
-  api/                       FastAPI: endpoints y DTOs
+  api/                       FastAPI: endpoints, DTOs, mensajes de error en español y panel web (panel.html)
   config.py · sistema.py     configuración por variables de entorno y composition root
 tests/unit · tests/integration   332 pruebas (una corre solo con PostgreSQL) · cobertura 99 %
 datos/                       paquete de datos ficticios del profesor (sin cambios)
@@ -79,6 +80,41 @@ Las pruebas usan SQLite en memoria; si existe `TEST_DATABASE_URL`, también corr
 1. En render.com: **New → Blueprint** y elegir este repositorio. `render.yaml` crea la base PostgreSQL y el servicio web con el `Dockerfile`.
 2. Al terminar, abrir `https://<servicio>.onrender.com/docs`.
 3. Opcional: copiar el *Deploy Hook* del servicio en el secreto `RENDER_DEPLOY_HOOK` del repositorio para que el pipeline despliegue al hacer push a `main`.
+
+## Panel para el usuario (`/panel`)
+
+Página web sencilla sobre la misma API, pensada para quien no conoce Swagger: lista de solicitudes con botones
+**Revisar**, **Formalizar**, **Concluir** y **Cancelar**; alta de solicitudes; cursos con su cupo; inscripción a un
+grupo con pago; y verificación pública de certificados. Cada acción muestra el mensaje de la API en verde (éxito) o
+en rojo con su tipo: "Revisa los datos" (400), "Sin permiso" (403), "No encontrado" (404), "No se puede hacer en
+este momento" (409) y "No cumple una regla del negocio" (422).
+
+## Mensajes de la API
+
+Todas las respuestas de error traen solo `{"mensaje": "..."}`, en español y sin términos técnicos:
+
+| Código | Ejemplo de mensaje |
+|---|---|
+| 400 | El dato 'lugares' (curso 1) debe ser mayor o igual a 1. |
+| 403 | El usuario ce-1 no tiene permiso para esta acción; se requiere el rol Instructor o plataforma LMS. |
+| 404 | No existe la solicitud EDU-O999. |
+| 409 | No se puede formalizar la solicitud EDU-O001 porque está en estado Inscrito. Solo se puede formalizar cuando está en Preinscrito. |
+| 422 | No se puede formalizar la solicitud EDU-O033: el estudiante está dado de baja. |
+
+## IDs para probar (datos del paquete del profesor)
+
+| Qué | IDs | Resultado al formalizar |
+|---|---|---|
+| Solicitudes válidas | `EDU-O001`, `EDU-O002`, `EDU-O003` (42 en total) | 200 · Inscrito |
+| Sin cursos | `EDU-O013`, `EDU-O039` | 422 · no tiene ningún curso |
+| Estudiante dado de baja | `EDU-O033` a `EDU-O037` | 422 · el estudiante está dado de baja |
+| Sin autorización | `EDU-O008`, `O016`, `O024`, `O032`, `O040`, `O048`, `O056` | 422 · no está autorizada |
+| Curso deshabilitado (`EDU-P011`) | `EDU-O005`, `O015`, `O020`, `O055` | 422 · el curso no está disponible |
+| Con promoción (sin beneficio) | `EDU-O009`, `O018`, `O027`, `O036`, `O045`, `O054` | Revisión: beneficio No |
+| Estudiantes | `EDU-C001` … `EDU-C040` (dados de baja: `C007`, `C014`, `C021`, `C028`, `C035`) | — |
+| Cursos y grupos | `EDU-P001` … `EDU-P020` · grupos `G-EDU-P001` … (`G-EDU-P001` tiene 13 lugares) | — |
+| Usuarios (`X-Usuario`) | `inst-1`, `inst-2` Instructor · `ce-1` Control Escolar · `coord-1` Coordinación | — |
+| No existen | `EDU-O999`, `NADA` | 404 |
 
 ## Guion de la demostración (Swagger, `/docs`)
 

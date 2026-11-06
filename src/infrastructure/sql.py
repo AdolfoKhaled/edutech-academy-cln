@@ -103,6 +103,11 @@ class SqlUnitOfWork(UnitOfWork):
         self.db.enTransaccion = False
 
 
+QUE_ES = {"cursos": "el curso", "grupos": "el grupo", "estudiantes": "el estudiante", "solicitudes": "la solicitud",
+          "inscripciones": "la inscripción", "expedientes": "el expediente de la inscripción",
+          "actas": "el acta del grupo"}
+
+
 class _SqlBase:
     tabla: Table
 
@@ -112,7 +117,7 @@ class _SqlBase:
     def _obtener(self, clave: str):
         filas = self.db.ejecutar(select(self.tabla.c.datos).where(self.tabla.c.id == clave))
         if not filas:
-            raise NoEncontrado(f"No existe {clave} en {self.tabla.name}")
+            raise NoEncontrado(f"No existe {QUE_ES.get(self.tabla.name, 'el registro')} {clave}.")
         return pickle.loads(filas[0][0])
 
     def _todos(self) -> list:

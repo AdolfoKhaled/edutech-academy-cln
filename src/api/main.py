@@ -6,11 +6,12 @@ Contrato de respuestas:
   404 no existe · 409 la máquina de estados o el momento no lo permiten · 422 regla de negocio incumplida"""
 import threading
 from datetime import date, datetime
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, Header, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlalchemy.exc import IntegrityError
 
 from ..application.inscripcion_service import EnListaDeEspera, SolicitarInscripcion
@@ -27,10 +28,13 @@ from ..domain.errores import (
     TransicionNoPermitida,
 )
 from ..domain.especificaciones import BENEFICIO_REFERENCIA, PUEDE_PROCESARSE
+from ..domain.solicitud import EXPLICACION
 from ..infrastructure.carga_csv import base_vacia, cargar_datos
 from ..sistema import Sistema
 from . import esquemas as E
+from .mensajes import explicar
 
+PANEL = Path(__file__).with_name("panel.html")
 ESTADO_HTTP = [(NoEncontrado, 404), (AccesoDenegado, 403), (CertificadoNoAutorizado, 403),
                (EvaluacionDeOtroInstructor, 403), (TransicionNoPermitida, 409), (ActaYaCerrada, 409),
                (EdicionBloqueada, 409), (ErrorDeDominio, 422)]
@@ -79,20 +83,21 @@ def crear_app(config: Configuracion | None = None, sistema: Sistema | None = Non
 
     @app.exception_handler(RequestValidationError)
     def peticion_mal_formada(_: Request, exc: RequestValidationError):
-        e = exc.errors()[0]
-        campo = ".".join(str(x) for x in e["loc"][1:]) or "cuerpo"
-        texto = (f"Falta el dato '{campo}' en la petición." if e["type"] == "missing"
-                 else f"El dato '{campo}' no es válido: {e['msg']}.")
-        return JSONResponse(status_code=400, content={"mensaje": texto})
+        return JSONResponse(status_code=400, content={"mensaje": explicar(exc.errors()[0])})
 
     @app.exception_handler(IntegrityError)
     def duplicado(_: Request, exc: IntegrityError):
-        return JSONResponse(status_code=409, content={"mensaje": "El registro ya existe (dato único duplicado)."})
+        return JSONResponse(status_code=409, content={"mensaje": "Ese registro ya existe; no se puede repetir."})
 
     # ---------------- General ----------------
     @app.get("/", include_in_schema=False)
     def inicio():
-        return RedirectResponse("/docs")
+        return RedirectResponse("/panel")
+
+    @app.get("/panel", include_in_schema=False, response_class=HTMLResponse)
+    def panel():
+        """Interfaz para el usuario: usa la misma API y muestra sus mensajes."""
+        return PANEL.read_text(encoding="utf-8")
 
     @app.get("/salud", tags=["General"])
     def salud():
@@ -163,8 +168,8 @@ def crear_app(config: Configuracion | None = None, sistema: Sistema | None = Non
     def evaluar(solicitudId: str):
         def accion(s):
             ev = s.solicitud.evaluar(solicitudId)
-            return {**vars(ev), "reglas": {"puedeProcesarse": PUEDE_PROCESARSE.nombre,
-                                           "beneficioReferencia": BENEFICIO_REFERENCIA.nombre}}
+            reglas = {"puedeProcesarse": PUEDE_PROCESARSE.nombre, "beneficioReferencia": BENEFICIO_REFERENCIA.nombre}
+            return {**vars(ev), "explicacion": [EXPLICACION.get(m, m) for m in ev.motivos], "reglas": reglas}
         return usar(accion)
 
     def transicion(solicitudId: str, accion, texto: str):

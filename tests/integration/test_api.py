@@ -24,7 +24,10 @@ def test_salud_y_swagger(api):
     r = api.get("/salud")
     assert r.status_code == 200 and r.json()["solicitudes"] == 60 and r.json()["baseDeDatos"] == "sqlite"
     assert api.get("/docs").status_code == 200
-    assert api.get("/", follow_redirects=False).headers["location"] == "/docs"
+    assert api.get("/", follow_redirects=False).headers["location"] == "/panel"
+    panel = api.get("/panel")
+    assert panel.status_code == 200 and "text/html" in panel.headers["content-type"]
+    assert "Solicitudes de inscripción" in panel.text and "/docs" in panel.text
     rutas = api.get("/openapi.json").json()["paths"]
     assert {"/solicitudes/{solicitudId}/formalizar", "/certificados", "/verificacion/{folio}"} <= set(rutas)
 
@@ -52,18 +55,20 @@ def test_409_transicion_no_permitida(api):
     api.post("/solicitudes/EDU-O003/formalizar")
     r = api.post("/solicitudes/EDU-O003/formalizar")
     assert r.status_code == 409
-    assert r.json() == {"mensaje": "No se puede formalizar una solicitud en estado Inscrito; se requiere Preinscrito"}
+    assert r.json() == {"mensaje": "No se puede formalizar la solicitud EDU-O003 porque está en estado Inscrito. "
+                                   "Solo se puede formalizar cuando está en Preinscrito."}
     assert api.post("/solicitudes/EDU-O004/concluir").status_code == 409
 
 
 def test_422_regla_de_negocio(api):
     r = api.post("/solicitudes/EDU-O013/formalizar")              # sin cursos
-    assert r.status_code == 422 and "al menos un curso" in r.json()["mensaje"]
+    assert r.status_code == 422 and r.json()["mensaje"] == ("No se puede formalizar la solicitud EDU-O013: "
+                                                     "la solicitud no tiene ningún curso.")
     assert api.post("/solicitudes/EDU-O005/formalizar").status_code == 422   # curso deshabilitado
 
 
 def test_404_no_existe(api):
-    assert api.get("/solicitudes/EDU-O999").json() == {"mensaje": "No existe EDU-O999 en solicitudes"}
+    assert api.get("/solicitudes/EDU-O999").json() == {"mensaje": "No existe la solicitud EDU-O999."}
     assert api.post("/solicitudes/EDU-O999/formalizar").status_code == 404
     assert api.get("/cursos/NADA").status_code == 404
 
@@ -79,6 +84,8 @@ def test_evaluacion_de_specifications(api):
     r = api.get("/solicitudes/EDU-O001/evaluacion").json()
     assert r["puedeProcesarse"] is True and r["total"] == "9358.00"
     assert "NO promoción activa" in r["reglas"]["beneficioReferencia"]
+    r = api.get("/solicitudes/EDU-O033/evaluacion").json()
+    assert (r["motivos"], r["explicacion"]) == (["estudiante activo"], ["el estudiante está dado de baja"])
 
 
 def test_201_registrar_y_400_mal_formada(api):
@@ -86,9 +93,10 @@ def test_201_registrar_y_400_mal_formada(api):
                                        "fecha": "2026-11-05"})
     assert r.status_code == 201 and r.json()["total"] == "1132.00" and r.json()["estado"] == "Preinscrito"
     r = api.post("/solicitudes", json={"cursos": []})
-    assert r.status_code == 400 and r.json() == {"mensaje": "Falta el dato 'estudianteId' en la petición."}
+    assert r.status_code == 400 and r.json() == {"mensaje": "Falta el dato 'estudiante' en la petición."}
     r = api.post("/solicitudes", json={"estudianteId": "EDU-C001", "cursos": [{"cursoId": "EDU-P001", "lugares": 0}]})
-    assert r.status_code == 400 and "lugares" in r.json()["mensaje"]
+    assert r.status_code == 400
+    assert r.json()["mensaje"] == "El dato 'lugares' (curso 1) debe ser mayor o igual a 1."
     r = api.post("/solicitudes", json={"estudianteId": "EDU-C001", "cursos": [{"cursoId": "EDU-P001", "lugares": 11}]})
     assert r.status_code == 422
 
@@ -175,7 +183,7 @@ def test_lista_de_espera_y_vencimiento(api):
 
 def test_peticion_con_tipo_invalido(api):
     r = api.post("/inscripciones/00001/pagos", json={"monto": "abc"})
-    assert r.status_code == 400 and r.json()["mensaje"].startswith("El dato 'monto' no es válido")
+    assert r.status_code == 400 and r.json()["mensaje"] == "El dato 'monto' debe ser un importe, por ejemplo 566.00."
 
 
 def test_inicio_perezoso_con_base_de_archivo(tmp_path):
@@ -192,3 +200,50 @@ def test_fecha_actual_por_defecto(api):
     r = api.post(f"/inscripciones/{iid}/vencimiento")
     assert r.status_code == 200
     assert datetime.now().year >= 2026
+
+
+# ---------- Mensajes entendibles para el usuario ----------
+@pytest.mark.parametrize("cuerpo, mensaje", [
+    ({"estudianteId": "EDU-C001", "cursos": [{"cursoId": "EDU-P001", "lugares": "dos"}]},
+     "El dato 'lugares' (curso 1) debe ser un número entero."),
+    ({"estudianteId": "EDU-C001", "cursos": [{"cursoId": "EDU-P001", "lugares": 1}], "fecha": "05/11/2026"},
+     "El dato 'fecha' debe ser una fecha con formato AAAA-MM-DD."),
+    ({"estudianteId": "EDU-C001", "cursos": [{"lugares": 1}]}, "Falta el dato 'curso' (curso 1) en la petición."),
+    ({"estudianteId": "EDU-C001", "cursos": "EDU-P001"}, "El dato 'cursos' debe ser una lista."),
+])
+def test_400_mensajes_en_espanol(api, cuerpo, mensaje):
+    r = api.post("/solicitudes", json=cuerpo)
+    assert (r.status_code, r.json()) == (400, {"mensaje": mensaje})
+
+
+def test_400_json_invalido_y_encabezado(api):
+    r = api.post("/solicitudes", content="{mal", headers={"content-type": "application/json"})
+    assert r.json() == {"mensaje": "El cuerpo de la petición no es un JSON válido."}
+    r = api.post("/inscripciones/00001/asistencias", json={"sesion": 11}, headers=INSTRUCTOR)
+    assert r.json() == {"mensaje": "El dato 'sesión' debe ser menor o igual a 10."}
+
+
+@pytest.mark.parametrize("solicitud, motivo", [
+    ("EDU-O033", "el estudiante está dado de baja"), ("EDU-O008", "la solicitud no está autorizada"),
+    ("EDU-O005", "el curso EDU-P011 no está disponible en el catálogo")])
+def test_422_dice_el_motivo(api, solicitud, motivo):
+    r = api.post(f"/solicitudes/{solicitud}/formalizar")
+    assert r.status_code == 422 and r.json()["mensaje"] == f"No se puede formalizar la solicitud {solicitud}: {motivo}."
+
+
+def test_403_y_404_legibles(api):
+    iid = inscribir(api, "EDU-C001", "Alumno 01").json()["inscripcionId"]
+    r = api.post(f"/inscripciones/{iid}/asistencias", headers=CONTROL, json={"sesion": 1})
+    assert r.json()["mensaje"] == ("El usuario ce-1 no tiene permiso para esta acción; "
+                                   "se requiere el rol Instructor o plataforma LMS.")
+    assert api.get("/cursos/NADA").json() == {"mensaje": "No existe el curso NADA."}
+    assert api.get("/inscripciones/99999/estado-de-pago").json() == {"mensaje": "No existe la inscripción 99999."}
+
+
+def test_tipo_de_evaluacion_invalido_es_422(api):
+    iid = inscribir(api, "EDU-C001", "Alumno 01").json()["inscripcionId"]
+    api.post(f"/inscripciones/{iid}/pagos", json={"monto": "566.00"})
+    r = api.post(f"/inscripciones/{iid}/evaluaciones", headers=INSTRUCTOR,
+                 json={"clave": "x", "tipo": "examen", "valor": 80})
+    assert r.status_code == 422
+    assert r.json() == {"mensaje": "El tipo de evaluación debe ser parcial, proyecto o actividad."}

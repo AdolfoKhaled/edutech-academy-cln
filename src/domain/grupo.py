@@ -35,7 +35,7 @@ class Grupo:
     def reservarLugar(self, inscripcionId: str) -> LugarReservado:
         # INV-03: los lugares ocupados no superan la capacidad.
         if len(self.ocupados) >= self.cupo.capacidad:
-            raise SinCupo("El grupo alcanzó su cupo máximo")
+            raise SinCupo(f"El grupo {self.grupoId} ya no tiene lugares disponibles.")
         self.ocupados.append(inscripcionId)
         # US-06: la fecha límite de pago es 7 días naturales desde el inicio del curso.
         return LugarReservado(self.grupoId, inscripcionId, self.fechaInicio + timedelta(days=7))

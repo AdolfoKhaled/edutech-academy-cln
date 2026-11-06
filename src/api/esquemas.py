@@ -77,6 +77,7 @@ class EvaluacionOut(BaseModel):
     solicitudId: str
     puedeProcesarse: bool
     motivos: list[str]
+    explicacion: list[str]
     beneficioReferencia: bool
     total: Decimal
     reglas: dict[str, str]

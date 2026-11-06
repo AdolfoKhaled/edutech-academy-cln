@@ -112,7 +112,7 @@ class Evaluacion:
 
     def __post_init__(self):
         if self.tipo not in ("parcial", "proyecto", "actividad"):
-            raise ValueError("Tipo de evaluación desconocido")
+            raise DatosInvalidos("El tipo de evaluación debe ser parcial, proyecto o actividad.")
         if not 0 <= self.valor <= 100:
             raise EvaluacionFueraDeRango("La evaluación debe estar entre 0 y 100")
 

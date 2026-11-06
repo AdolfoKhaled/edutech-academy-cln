@@ -25,6 +25,14 @@ from .valores import Dinero
 MAX_LUGARES_POR_CURSO = 10
 
 
+# Cómo se le explica al usuario cada condición de PUEDE_PROCESARSE que no se cumple.
+EXPLICACION = {
+    "estudiante activo": "el estudiante está dado de baja",
+    "solicitud con al menos un curso": "la solicitud no tiene ningún curso",
+    "solicitud autorizada": "la solicitud no está autorizada",
+}
+
+
 class EstadoSolicitud(Enum):
     PREINSCRITO = "Preinscrito"
     INSCRITO = "Inscrito"
@@ -51,7 +59,7 @@ class LineaDeSolicitud:
         if not self.cursoId.strip():
             raise DatosInvalidos("La línea necesita un curso")
         if not 0 < self.lugares <= MAX_LUGARES_POR_CURSO:
-            raise DatosInvalidos(f"Los lugares por curso van de 1 a {MAX_LUGARES_POR_CURSO}")
+            raise DatosInvalidos(f"Los lugares por curso van de 1 a {MAX_LUGARES_POR_CURSO}.")
 
     @property
     def subtotal(self) -> Dinero:
@@ -97,17 +105,21 @@ class SolicitudDeInscripcion:
     def agregarCurso(self, curso: Curso, lugares: int) -> None:
         self._exigir("agregar cursos a", EstadoSolicitud.PREINSCRITO)
         if any(linea.cursoId == curso.cursoId for linea in self.lineas):
-            raise DatosInvalidos(f"El curso {curso.cursoId} ya está en la solicitud")
+            raise DatosInvalidos(f"El curso {curso.cursoId} ya está en la solicitud; "
+                                 "cambia los lugares en vez de repetirlo.")
         self.lineas.append(LineaDeSolicitud(curso.cursoId, lugares, Dinero.de(curso.costo)))
 
     def formalizar(self, estudiante: Estudiante, cursos: dict[str, Curso]) -> SolicitudFormalizada:
         self._exigir("formalizar", EstadoSolicitud.PREINSCRITO)
         incumplidas = PUEDE_PROCESARSE.incumplidas(CandidatoSolicitud(self, estudiante))
         if incumplidas:
-            raise SolicitudNoProcesable("No se puede formalizar: falta " + ", ".join(incumplidas))
+            motivos = "; ".join(EXPLICACION.get(m, m) for m in incumplidas)
+            raise SolicitudNoProcesable(f"No se puede formalizar la solicitud {self.solicitudId}: {motivos}.")
         deshabilitados = [c for c in (linea.cursoId for linea in self.lineas) if not cursos[c].habilitado]
         if deshabilitados:
-            raise CursoNoDisponible("Cursos deshabilitados: " + ", ".join(deshabilitados))
+            lista = ", ".join(deshabilitados)
+            raise CursoNoDisponible(f"No se puede formalizar la solicitud {self.solicitudId}: el curso {lista} "
+                                    "no está disponible en el catálogo.")
         self.estado = EstadoSolicitud.INSCRITO
         self.folio = f"INS-{self.solicitudId}"          # INV-08: el folio se genera una sola vez
         evento = SolicitudFormalizada(self.solicitudId, self.folio, str(self.total.monto))
@@ -124,7 +136,7 @@ class SolicitudDeInscripcion:
     def cancelar(self, motivo: str = "Cancelada por el estudiante") -> SolicitudLiberada:
         self._exigir("cancelar", EstadoSolicitud.PREINSCRITO)
         if not motivo or not motivo.strip():
-            raise DatosInvalidos("La cancelación requiere un motivo")
+            raise DatosInvalidos("Escribe el motivo de la cancelación.")
         self.estado = EstadoSolicitud.LIBERADA
         self.motivoLiberacion = motivo.strip()
         evento = SolicitudLiberada(self.solicitudId, self.motivoLiberacion)
@@ -134,4 +146,5 @@ class SolicitudDeInscripcion:
     def _exigir(self, accion: str, requerido: EstadoSolicitud) -> None:
         if self.estado is not requerido:
             raise TransicionNoPermitida(
-                f"No se puede {accion} una solicitud en estado {self.estado.value}; se requiere {requerido.value}")
+                f"No se puede {accion} la solicitud {self.solicitudId} porque está en estado {self.estado.value}. "
+                f"Solo se puede {accion} cuando está en {requerido.value}.")

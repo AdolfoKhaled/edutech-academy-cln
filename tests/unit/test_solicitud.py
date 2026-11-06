@@ -111,7 +111,7 @@ def test_desde_inscrito_no_se_formaliza_ni_cancela(accion):
 
 def test_no_se_salta_a_concluido():
     s = solicitud()
-    with pytest.raises(TransicionNoPermitida, match="se requiere Inscrito"):
+    with pytest.raises(TransicionNoPermitida, match="Solo se puede concluir cuando está en Inscrito"):
         s.concluir()
 
 
@@ -133,19 +133,19 @@ def test_solo_preinscrito_agrega_cursos():
 # ---------- Reglas al formalizar ----------
 def test_estudiante_inactivo_no_formaliza():
     s = solicitud()
-    with pytest.raises(SolicitudNoProcesable, match="estudiante activo"):
+    with pytest.raises(SolicitudNoProcesable, match="el estudiante está dado de baja"):
         s.formalizar(Estudiante("E-1", "Ana", activo=False), cursos())
     assert s.estado is EstadoSolicitud.PREINSCRITO
 
 
 def test_sin_autorizacion_no_formaliza():
-    with pytest.raises(SolicitudNoProcesable, match="autorizada"):
+    with pytest.raises(SolicitudNoProcesable, match="no está autorizada"):
         solicitud(False).formalizar(ANA, cursos())
 
 
 def test_sin_cursos_no_formaliza():
     s = SolicitudDeInscripcion.registrar("S-2", "E-1", date(2026, 11, 1), True)
-    with pytest.raises(SolicitudNoProcesable, match="al menos un curso"):
+    with pytest.raises(SolicitudNoProcesable, match="no tiene ningún curso"):
         s.formalizar(ANA, cursos())
 
 

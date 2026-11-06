@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EduTech Academy · Panel</title>
+<style>
+  :root {
+    --fondo: #f5f7fb; --tarjeta: #ffffff; --texto: #1d2433; --suave: #5b6478; --borde: #dde2ec;
+    --primario: #2b59c3; --primario-hover: #1f469e; --ok: #157347; --ok-fondo: #e5f4ec;
+    --error: #b42318; --error-fondo: #fdecea; --aviso: #8a5a00; --aviso-fondo: #fff4d6;
+    --gris-fondo: #eef1f6; --sombra: 0 1px 3px rgba(20, 30, 60, .08);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+         background: var(--fondo); color: var(--texto); }
+  header { background: var(--tarjeta); border-bottom: 1px solid var(--borde); }
+  .barra { max-width: 1180px; margin: 0 auto; padding: 14px 16px; display: flex; gap: 12px;
+           align-items: center; flex-wrap: wrap; }
+  .marca { font-weight: 700; font-size: 18px; margin-right: auto; }
+  .marca small { display: block; font-weight: 400; font-size: 13px; color: var(--suave); }
+  .estado-sistema { font-size: 13px; color: var(--suave); }
+  .estado-sistema b { color: var(--ok); }
+  nav { max-width: 1180px; margin: 0 auto; padding: 0 16px; display: flex; gap: 4px; overflow-x: auto; }
+  nav button { border: 0; background: none; padding: 10px 14px; font: inherit; color: var(--suave);
+               border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; }
+  nav button[aria-selected="true"] { color: var(--primario); border-bottom-color: var(--primario); font-weight: 600; }
+  main { max-width: 1180px; margin: 0 auto; padding: 16px; }
+  .tarjeta { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 10px;
+             box-shadow: var(--sombra); padding: 16px; margin-bottom: 16px; }
+  h2 { font-size: 18px; margin: 0 0 4px; }
+  .ayuda { color: var(--suave); margin: 0 0 14px; font-size: 14px; }
+  .fila { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+  label { display: grid; gap: 4px; font-size: 13px; color: var(--suave); }
+  input, select { font: inherit; padding: 8px 10px; border: 1px solid var(--borde); border-radius: 7px;
+                  background: #fff; color: var(--texto); min-width: 0; }
+  input:focus, select:focus, button:focus-visible { outline: 2px solid var(--primario); outline-offset: 1px; }
+  .boton { font: inherit; border: 1px solid var(--primario); background: var(--primario); color: #fff;
+           padding: 8px 14px; border-radius: 7px; cursor: pointer; }
+  .boton:hover { background: var(--primario-hover); }
+  .boton.secundario { background: #fff; color: var(--primario); }
+  .boton.secundario:hover { background: var(--gris-fondo); }
+  .boton.peligro { background: #fff; color: var(--error); border-color: var(--error); }
+  .boton.chico { padding: 4px 10px; font-size: 13px; }
+  .tabla { width: 100%; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--suave); }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .acciones { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .chip.Preinscrito { background: var(--aviso-fondo); color: var(--aviso); }
+  .chip.Inscrito { background: #e3ecff; color: var(--primario); }
+  .chip.Concluido { background: var(--ok-fondo); color: var(--ok); }
+  .chip.Liberada { background: var(--gris-fondo); color: var(--suave); }
+  .chip.no { background: var(--error-fondo); color: var(--error); }
+  #aviso { position: sticky; top: 0; z-index: 5; display: none; margin-bottom: 16px; padding: 12px 14px;
+           border-radius: 9px; border: 1px solid; font-size: 15px; }
+  #aviso.ok { display: block; background: var(--ok-fondo); color: var(--ok); border-color: #a9d8bd; }
+  #aviso.error { display: block; background: var(--error-fondo); color: var(--error); border-color: #f2b8b2; }
+  #aviso strong { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; }
+  .resultado { margin-top: 12px; padding: 12px; background: var(--gris-fondo); border-radius: 8px; font-size: 14px; }
+  .resultado dt { color: var(--suave); font-size: 12px; } .resultado dd { margin: 0 0 6px; font-weight: 600; }
+  .barra-cupo { height: 7px; background: var(--gris-fondo); border-radius: 4px; overflow: hidden; min-width: 90px; }
+  .barra-cupo span { display: block; height: 100%; background: var(--primario); }
+  .linea { display: grid; grid-template-columns: 1fr 110px auto; gap: 8px; margin-bottom: 8px; }
+  .total { font-size: 18px; font-weight: 700; }
+  .oculto { display: none !important; }
+  dialog { border: 1px solid var(--borde); border-radius: 12px; padding: 18px; max-width: 420px; width: calc(100% - 32px); }
+  dialog::backdrop { background: rgba(20, 30, 60, .35); }
+  @media (max-width: 640px) { .linea { grid-template-columns: 1fr 80px; } .linea .boton { grid-column: span 2; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="barra">
+    <div class="marca">EduTech Academy<small>Inscripciones y certificados</small></div>
+    <span class="estado-sistema" id="estadoSistema">Conectando…</span>
+    <button class="boton secundario chico" id="reiniciar" type="button">Reiniciar datos de demostración</button>
+    <a class="boton secundario chico" href="/docs" target="_blank" rel="noopener">Documentación técnica (Swagger)</a>
+  </div>
+  <nav role="tablist" aria-label="Secciones">
+    <button role="tab" aria-selected="true" data-seccion="solicitudes">Solicitudes</button>
+    <button role="tab" aria-selected="false" data-seccion="nueva">Nueva solicitud</button>
+    <button role="tab" aria-selected="false" data-seccion="cursos">Cursos y cupo</button>
+    <button role="tab" aria-selected="false" data-seccion="inscripcion">Inscripción y pago</button>
+    <button role="tab" aria-selected="false" data-seccion="verificar">Verificar certificado</button>
+  </nav>
+</header>
+
+<main>
+  <div id="aviso" role="status" aria-live="polite"></div>
+
+  <section id="solicitudes" class="tarjeta">
+    <h2>Solicitudes de inscripción</h2>
+    <p class="ayuda">Una solicitud empieza en <b>Preinscrito</b>. Al formalizarla pasa a <b>Inscrito</b> y se apartan
+      los lugares; al terminar el curso queda <b>Concluido</b>. Si se cancela antes de formalizarla queda <b>Liberada</b>.</p>
+    <div class="fila" style="margin-bottom:12px">
+      <label>Estado
+        <select id="filtroEstado">
+          <option value="">Todos</option><option>Preinscrito</option><option>Inscrito</option>
+          <option>Concluido</option><option>Liberada</option>
+        </select>
+      </label>
+      <label>Buscar
+        <input id="buscar" placeholder="EDU-O001 o EDU-C005" autocomplete="off">
+      </label>
+      <span class="ayuda" id="conteo" style="margin:0 0 8px"></span>
+    </div>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Solicitud</th><th>Estudiante</th><th>Cursos (lugares)</th><th class="num">Total</th>
+          <th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="tablaSolicitudes"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="nueva" class="tarjeta oculto">
+    <h2>Nueva solicitud</h2>
+    <p class="ayuda">Elige al estudiante y los cursos. La solicitud se registra en Preinscrito; los lugares se apartan
+      cuando se formaliza.</p>
+    <form id="formNueva">
+      <div class="fila" style="margin-bottom:12px">
+        <label style="flex:1 1 260px">Estudiante <select id="nuevaEstudiante" required></select></label>
+        <label style="flex-direction:row;display:flex;gap:6px;align-items:center">
+          <input type="checkbox" id="nuevaAutorizada" checked> Autorizada</label>
+        <label style="flex-direction:row;display:flex;gap:6px;align-items:center">
+          <input type="checkbox" id="nuevaPromocion"> Tiene promoción</label>
+      </div>
+      <div id="lineas"></div>
+      <div class="fila" style="justify-content:space-between;margin-top:8px">
+        <button type="button" class="boton secundario" id="agregarLinea">+ Agregar curso</button>
+        <span>Total estimado: <span class="total" id="totalNueva">$0.00</span></span>
+        <button class="boton" type="submit">Registrar solicitud</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="cursos" class="tarjeta oculto">
+    <h2>Cursos y cupo disponible</h2>
+    <p class="ayuda">Cada curso tiene un grupo abierto. Un grupo en línea admite como máximo 40 lugares.</p>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Curso</th><th>Nombre</th><th class="num">Precio</th><th>Grupo</th><th>Ocupación</th>
+          <th class="num">Disponibles</th><th>Estado</th></tr></thead>
+        <tbody id="tablaCursos"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="inscripcion" class="tarjeta oculto">
+    <h2>Inscripción a un grupo</h2>
+    <p class="ayuda">Registra la solicitud con nombre, correo y teléfono. Si el grupo está lleno, queda en lista de espera.
+      Con el pago del 50 % del curso la inscripción queda formalizada.</p>
+    <form id="formInscripcion" class="fila">
+      <label style="flex:1 1 220px">Grupo <select id="insGrupo" required></select></label>
+      <label style="flex:1 1 220px">Estudiante <select id="insEstudiante" required></select></label>
+      <label style="flex:1 1 180px">Correo <input id="insCorreo" type="email" value="alumno@example.com" required></label>
+      <label style="flex:1 1 140px">Teléfono <input id="insTelefono" value="8100000000" required></label>
+      <button class="boton" type="submit">Inscribir</button>
+    </form>
+    <div id="resultadoInscripcion"></div>
+    <hr style="border:0;border-top:1px solid var(--borde);margin:18px 0">
+    <h2>Registrar pago o consultar saldo</h2>
+    <form id="formPago" class="fila" style="margin-top:10px">
+      <label>Inscripción <input id="pagoInscripcion" placeholder="00001" required></label>
+      <label>Monto (MXN) <input id="pagoMonto" inputmode="decimal" placeholder="283.00"></label>
+      <button class="boton" type="submit">Registrar pago</button>
+      <button class="boton secundario" type="button" id="consultarSaldo">Consultar saldo</button>
+    </form>
+    <div id="resultadoPago"></div>
+  </section>
+
+  <section id="verificar" class="tarjeta oculto">
+    <h2>Verificar un certificado</h2>
+    <p class="ayuda">Cualquier persona puede comprobar si un certificado es auténtico con su folio.</p>
+    <form id="formVerificar" class="fila">
+      <label style="flex:1 1 260px">Folio <input id="folio" placeholder="CERT-00001" required></label>
+      <button class="boton" type="submit">Verificar</button>
+    </form>
+    <div id="resultadoVerificar"></div>
+  </section>
+</main>
+
+<dialog id="dialogo">
+  <form method="dialog" id="formDialogo">
+    <h2 id="dialogoTitulo">Evaluación</h2>
+    <div id="dialogoCuerpo"></div>
+    <div class="fila" style="justify-content:flex-end;margin-top:14px" id="dialogoBotones"></div>
+  </form>
+</dialog>
+
+<script>
+const TITULO_ERROR = {400: "Revisa los datos", 403: "Sin permiso", 404: "No encontrado",
+                      409: "No se puede hacer en este momento", 422: "No cumple una regla del negocio"};
+const ACCION = {formalizar: "Formalizar", concluir: "Concluir", cancelar: "Cancelar"};
+const pesos = new Intl.NumberFormat("es-MX", {style: "currency", currency: "MXN"});
+const $ = id => document.getElementById(id);
+const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+let estudiantes = [], cursos = [], solicitudes = [];
+
+function avisar(ok, mensaje, codigo) {
+  const a = $("aviso");
+  a.className = ok ? "ok" : "error";
+  a.innerHTML = (ok ? "<strong>Listo</strong>" : `<strong>${esc(TITULO_ERROR[codigo] || "Ocurrió un problema")}</strong>`) + esc(mensaje);
+  a.scrollIntoView({block: "nearest"});
+}
+
+async function api(metodo, ruta, cuerpo, mostrar = true) {
+  let r, datos;
+  try {
+    r = await fetch(ruta, {method: metodo, headers: cuerpo ? {"Content-Type": "application/json"} : {},
+                           body: cuerpo ? JSON.stringify(cuerpo) : undefined});
+    datos = await r.json();
+  } catch (e) {
+    avisar(false, "No se pudo conectar con el servidor. Intenta de nuevo en unos segundos.");
+    throw e;
+  }
+  if (!r.ok) { if (mostrar) avisar(false, datos.mensaje, r.status); throw Object.assign(new Error(datos.mensaje), {codigo: r.status}); }
+  if (mostrar && datos.mensaje) avisar(true, datos.mensaje);
+  return datos;
+}
+
+function nombreEstudiante(id) {
+  const e = estudiantes.find(x => x.estudianteId === id);
+  return e ? e.nombre : id;
+}
+
+// ---------- Pestañas ----------
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("nav button").forEach(x => x.setAttribute("aria-selected", x === b));
+  document.querySelectorAll("main section").forEach(s => s.classList.toggle("oculto", s.id !== b.dataset.seccion));
+  if (b.dataset.seccion === "cursos") cargarCursos();
+}));
+
+// ---------- Solicitudes ----------
+async function cargarSolicitudes() {
+  solicitudes = await api("GET", "/solicitudes", null, false);
+  $("estadoSistema").innerHTML = `Sistema <b>en línea</b> · ${solicitudes.length} solicitudes`;
+  pintarSolicitudes();
+}
+
+function pintarSolicitudes() {
+  const estado = $("filtroEstado").value, texto = $("buscar").value.trim().toUpperCase();
+  const lista = solicitudes.filter(s => (!estado || s.estado === estado) &&
+    (!texto || s.solicitudId.includes(texto) || s.estudianteId.includes(texto) || nombreEstudiante(s.estudianteId).toUpperCase().includes(texto)));
+  $("conteo").textContent = `${lista.length} de ${solicitudes.length} solicitudes`;
+  $("tablaSolicitudes").innerHTML = lista.map(s => `
+    <tr>
+      <td><b>${esc(s.solicitudId)}</b>${s.folio ? `<br><small>Folio ${esc(s.folio)}</small>` : ""}</td>
+      <td>${esc(nombreEstudiante(s.estudianteId))}<br><small>${esc(s.estudianteId)}</small></td>
+      <td>${s.lineas.length ? s.lineas.map(l => `${esc(l.cursoId)} (${l.lugares})`).join("<br>") : '<span class="chip no">Sin cursos</span>'}</td>
+      <td class="num">${pesos.format(s.total)}</td>
+      <td><span class="chip ${esc(s.estado)}">${esc(s.estado)}</span></td>
+      <td><div class="acciones">
+        <button class="boton secundario chico" data-evaluar="${esc(s.solicitudId)}">Revisar</button>
+        ${s.accionesPermitidas.map(a => `<button class="boton chico ${a === "cancelar" ? "peligro" : ""}"
+           data-accion="${a}" data-id="${esc(s.solicitudId)}">${ACCION[a]}</button>`).join("")}
+      </div></td>
+    </tr>`).join("") || '<tr><td colspan="6">No hay solicitudes con ese filtro.</td></tr>';
+}
+
+$("filtroEstado").addEventListener("change", pintarSolicitudes);
+$("buscar").addEventListener("input", pintarSolicitudes);
+
+$("tablaSolicitudes").addEventListener("click", async ev => {
+  const b = ev.target.closest("button");
+  if (!b) return;
+  if (b.dataset.evaluar) return mostrarEvaluacion(b.dataset.evaluar);
+  const {accion, id} = b.dataset;
+  if (accion === "cancelar") return pedirMotivo(id);
+  try { await api("POST", `/solicitudes/${id}/${accion}`); } catch { /* el aviso ya muestra el motivo */ }
+  cargarSolicitudes();
+});
+
+async function mostrarEvaluacion(id) {
+  const ev = await api("GET", `/solicitudes/${id}/evaluacion`, null, false);
+  $("dialogoTitulo").textContent = `Revisión de ${id}`;
+  $("dialogoCuerpo").innerHTML = `
+    <p><b>¿Se puede formalizar?</b> ${ev.puedeProcesarse ? '<span class="chip Concluido">Sí</span>' : '<span class="chip no">No</span>'}</p>
+    ${ev.explicacion.length ? `<p>No se puede porque ${ev.explicacion.map(esc).join("; ")}.</p>` : "<p>Cumple todo: el estudiante está activo, la solicitud tiene cursos y está autorizada.</p>"}
+    <p><b>¿Aplica beneficio por referencia?</b> ${ev.beneficioReferencia ? "Sí" : "No"}
+      <br><small>Estudiante preferente, total de $1,500 o más y sin otra promoción.</small></p>
+    <p><b>Total:</b> ${pesos.format(ev.total)}</p>`;
+  $("dialogoBotones").innerHTML = '<button class="boton" value="cerrar">Cerrar</button>';
+  $("dialogo").showModal();
+}
+
+function pedirMotivo(id) {
+  $("dialogoTitulo").textContent = `Cancelar ${id}`;
+  $("dialogoCuerpo").innerHTML = `<label>Motivo de la cancelación
+    <input id="motivo" value="Cancelada por el estudiante" required></label>`;
+  $("dialogoBotones").innerHTML = '<button class="boton secundario" value="cerrar">Volver</button>' +
+                                  '<button class="boton peligro" value="cancelar">Cancelar solicitud</button>';
+  $("dialogo").returnValue = "";
+  $("dialogo").showModal();
+  $("dialogo").onclose = async () => {
+    $("dialogo").onclose = null;
+    if ($("dialogo").returnValue !== "cancelar") return;
+    try { await api("POST", `/solicitudes/${id}/cancelar`, {motivo: $("motivo").value}); } catch { }
+    cargarSolicitudes();
+  };
+}
+
+// ---------- Nueva solicitud ----------
+function opcionesCursos() {
+  return cursos.map(c => `<option value="${esc(c.cursoId)}">${esc(c.cursoId)} · ${esc(c.nombre)} · ${pesos.format(c.precio)}
+    · ${c.disponibles} disponibles${c.habilitado ? "" : " (no disponible)"}</option>`).join("");
+}
+
+function agregarLinea() {
+  const div = document.createElement("div");
+  div.className = "linea";
+  div.innerHTML = `<select aria-label="Curso" class="lineaCurso">${opcionesCursos()}</select>
+    <input aria-label="Lugares" class="lineaLugares" type="number" min="1" max="10" value="1">
+    <button type="button" class="boton secundario chico">Quitar</button>`;
+  const usados = [...$("lineas").querySelectorAll(".lineaCurso")].map(x => x.value);
+  const libre = cursos.find(c => c.habilitado && !usados.includes(c.cursoId));
+  if (libre) div.querySelector(".lineaCurso").value = libre.cursoId;      // no repetir un curso ya elegido
+  div.querySelector("button").onclick = () => { div.remove(); calcularTotal(); };
+  div.addEventListener("input", calcularTotal);
+  $("lineas").append(div);
+  calcularTotal();
+}
+
+function calcularTotal() {
+  let total = 0;
+  $("lineas").querySelectorAll(".linea").forEach(l => {
+    const c = cursos.find(x => x.cursoId === l.querySelector(".lineaCurso").value);
+    total += (c ? Number(c.precio) : 0) * (Number(l.querySelector(".lineaLugares").value) || 0);
+  });
+  $("totalNueva").textContent = pesos.format(total);
+}
+
+$("agregarLinea").onclick = agregarLinea;
+$("formNueva").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const lineas = [...$("lineas").querySelectorAll(".linea")].map(l => ({
+    cursoId: l.querySelector(".lineaCurso").value, lugares: Number(l.querySelector(".lineaLugares").value)}));
+  try {
+    const s = await api("POST", "/solicitudes", {estudianteId: $("nuevaEstudiante").value, cursos: lineas,
+      autorizada: $("nuevaAutorizada").checked, promocionActiva: $("nuevaPromocion").checked});
+    avisar(true, `${s.mensaje} Número de solicitud: ${s.solicitudId}. Total: ${pesos.format(s.total)}.`);
+    $("lineas").innerHTML = ""; agregarLinea();
+    cargarSolicitudes();
+  } catch { }
+});
+
+// ---------- Cursos ----------
+async function cargarCursos() {
+  cursos = await api("GET", "/cursos", null, false);
+  $("tablaCursos").innerHTML = cursos.map(c => `
+    <tr><td><b>${esc(c.cursoId)}</b></td><td>${esc(c.nombre)}</td><td class="num">${pesos.format(c.precio)}</td>
+      <td>${esc(c.grupoId)}</td>
+      <td><div class="barra-cupo" title="${c.ocupados} de ${c.cupo}"><span style="width:${Math.round(100 * c.ocupados / c.cupo)}%"></span></div>
+        <small>${c.ocupados} de ${c.cupo}</small></td>
+      <td class="num">${c.disponibles}</td>
+      <td>${c.habilitado ? '<span class="chip Concluido">Disponible</span>' : '<span class="chip no">No disponible</span>'}</td></tr>`).join("");
+}
+
+// ---------- Inscripción y pago (CU-01) ----------
+async function cargarGrupos() {
+  const elegido = $("insGrupo").value;
+  cursos = await api("GET", "/cursos", null, false);
+  $("insGrupo").innerHTML = cursos.map(c => `<option value="${esc(c.grupoId)}">${esc(c.grupoId)} · ${esc(c.nombre)} · ${c.disponibles} disponibles</option>`).join("");
+  if (elegido) $("insGrupo").value = elegido;
+}
+
+$("formInscripcion").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const e = estudiantes.find(x => x.estudianteId === $("insEstudiante").value);
+  try {
+    const r = await api("POST", `/grupos/${$("insGrupo").value}/inscripciones`, {estudianteId: e.estudianteId,
+      nombre: e.nombre, correo: $("insCorreo").value, telefono: $("insTelefono").value});
+    $("resultadoInscripcion").innerHTML = r.inscripcionId ? `<dl class="resultado">
+      <dt>Inscripción</dt><dd>${esc(r.inscripcionId)}</dd><dt>Estado</dt><dd>${esc(r.estado)}</dd>
+      <dt>Costo del curso</dt><dd>${pesos.format(r.monto)} (con ${pesos.format(r.monto / 2)} queda formalizada)</dd>
+      <dt>Fecha límite de pago</dt><dd>${esc(r.fechaLimitePago)}</dd></dl>` : `<p class="resultado">${esc(r.mensaje)}</p>`;
+    if (r.inscripcionId) { $("pagoInscripcion").value = r.inscripcionId; $("pagoMonto").value = (r.monto / 2).toFixed(2); }
+    await cargarGrupos();
+  } catch { $("resultadoInscripcion").innerHTML = ""; }
+});
+
+$("formPago").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  if (!$("pagoMonto").value) return avisar(false, "Escribe el monto del pago.", 400);
+  try {
+    const r = await api("POST", `/inscripciones/${encodeURIComponent($("pagoInscripcion").value.trim())}/pagos`,
+                        {monto: $("pagoMonto").value.trim()});
+    $("resultadoPago").innerHTML = `<p class="resultado">Estado de la inscripción: <b>${esc(r.estado)}</b></p>`;
+  } catch { $("resultadoPago").innerHTML = ""; }
+});
+
+$("consultarSaldo").onclick = async () => {
+  try {
+    const r = await api("GET", `/inscripciones/${encodeURIComponent($("pagoInscripcion").value.trim())}/estado-de-pago`, null, false);
+    $("resultadoPago").innerHTML = `<dl class="resultado"><dt>Estado</dt><dd>${esc(r.estado)}</dd>
+      <dt>Saldo pendiente</dt><dd>${pesos.format(r.saldoPendiente)}</dd><dt>Fecha límite</dt><dd>${esc(r.fechaLimitePago)}</dd></dl>`;
+    $("aviso").className = "";
+  } catch (e) { avisar(false, e.message, e.codigo); $("resultadoPago").innerHTML = ""; }
+};
+
+// ---------- Verificación pública (CU-05) ----------
+$("formVerificar").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  try {
+    const r = await api("GET", `/verificacion/${encodeURIComponent($("folio").value.trim())}`, null, false);
+    $("resultadoVerificar").innerHTML = `<dl class="resultado"><dt>Certificado auténtico</dt><dd>Sí</dd>
+      <dt>Titular</dt><dd>${esc(r.titular)}</dd><dt>Curso</dt><dd>${esc(r.curso)}</dd>
+      <dt>Fecha de conclusión</dt><dd>${esc(r.fechaConclusion)}</dd><dt>Vigencia</dt><dd>${esc(r.vigencia)}</dd></dl>`;
+    avisar(true, "El certificado es auténtico.");
+  } catch (e) { avisar(false, e.message, e.codigo); $("resultadoVerificar").innerHTML = ""; }
+});
+
+// ---------- Inicio ----------
+$("reiniciar").onclick = async () => {
+  try { await api("POST", "/demo/reiniciar"); await iniciar(); } catch { }
+};
+
+async function iniciar() {
+  const salud = await api("GET", "/salud", null, false);
+  $("estadoSistema").innerHTML = `Sistema <b>en línea</b> · ${esc(salud.solicitudes)} solicitudes`;
+  [estudiantes, cursos] = await Promise.all([api("GET", "/estudiantes", null, false), api("GET", "/cursos", null, false)]);
+  const opcionesEst = estudiantes.map(e => `<option value="${esc(e.estudianteId)}">${esc(e.nombre)} · ${esc(e.estudianteId)}${e.activo ? "" : " (dado de baja)"}${e.preferente ? " · preferente" : ""}</option>`).join("");
+  $("nuevaEstudiante").innerHTML = opcionesEst;
+  $("insEstudiante").innerHTML = opcionesEst;
+  await cargarGrupos();
+  $("lineas").innerHTML = ""; agregarLinea();
+  await cargarSolicitudes();
+}
+
+iniciar().catch(() => { $("estadoSistema").textContent = "Sin conexión con el servidor"; });
+</script>
+</body>
+</html>

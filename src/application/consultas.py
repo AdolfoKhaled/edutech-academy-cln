@@ -13,7 +13,7 @@ class VerificacionPublicaService:
         folio = folioOQr.rstrip("/").split("/")[-1]      # el QR lleva una URL que termina en el folio
         dto = self.reader.consultar(folio)
         if dto is None:
-            raise NoEncontrado("No existe un certificado con ese folio")
+            raise NoEncontrado(f"No existe un certificado con el folio {folio}.")
         return dto
 
 
@@ -26,5 +26,5 @@ class EstadoDePagoQuery:
     def consultarEstadoDePago(self, inscripcionId: str) -> EstadoDePagoDto:
         dto = self.reader.consultar(inscripcionId)
         if dto is None:
-            raise NoEncontrado("No existe la inscripción")
+            raise NoEncontrado(f"No existe la inscripción {inscripcionId}.")
         return dto

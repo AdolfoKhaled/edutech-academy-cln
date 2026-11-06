@@ -39,13 +39,19 @@ class ControlDeAcceso(ABC):
     def tieneRol(self, usuarioId: str, rol: str) -> bool: ...
 
 
+NOMBRE_ROL = {"ControlEscolar": "Control Escolar", "CoordinacionAcademica": "Coordinación Académica",
+              "Instructor": "Instructor", "LMS": "plataforma LMS"}
+
+
 class AccesoDenegado(Exception):
     """El usuario no tiene el rol que pide la operación."""
 
 
 def exigirRol(acceso: ControlDeAcceso, usuarioId: str, *roles: str) -> None:
     if not any(acceso.tieneRol(usuarioId, r) for r in roles):
-        raise AccesoDenegado("Se requiere el rol " + " o ".join(roles))
+        nombres = " o ".join(NOMBRE_ROL.get(r, r) for r in roles)
+        raise AccesoDenegado(f"El usuario {usuarioId or '(sin usuario)'} no tiene permiso para esta acción; "
+                             f"se requiere el rol {nombres}.")
 
 
 @dataclass(frozen=True)
