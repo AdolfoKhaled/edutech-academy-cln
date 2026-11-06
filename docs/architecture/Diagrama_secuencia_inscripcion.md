@@ -1,6 +1,6 @@
 # Diagrama de secuencia — Solicitud de inscripción y pago
 
-**Alcance:** representa el flujo implementado de CU-01 en la API. El sistema contable se representa como actor externo que notifica el pago mediante el adaptador. La lista de espera es una rama alternativa cuando no hay cupo.
+**Alcance:** representa el CU-01 implementado en la API: solicitud de inscripción, reserva de lugar o entrada a lista de espera y acreditación de pago. El sistema contable se modela como el origen externo de la notificación de pago; el adaptador incluido en el repositorio delega la operación a `InscripcionService`.
 
 ```mermaid
 sequenceDiagram
@@ -10,37 +10,52 @@ sequenceDiagram
     participant Servicio as InscripcionService
     participant Grupo as Grupo (dominio)
     participant Inscripcion as Inscripcion (dominio)
-    participant UoW as Unit of Work / Repositorios
-    participant Contable as Sistema contable (adaptador)
+    participant UoW as UnitOfWork y repositorios
+    actor Contable as Sistema contable externo
+    participant Adapter as SistemaContableAdapter
 
     Estudiante->>API: POST /grupos/{grupoId}/inscripciones
     API->>Servicio: solicitarInscripcion(cmd)
-    Servicio->>UoW: iniciar transacción y obtener Grupo/Curso
+    Servicio->>UoW: iniciar transaccion
     Servicio->>Grupo: reservarLugar(inscripcionId)
     alt Hay cupo disponible
-        Grupo-->>Servicio: lugar reservado + fecha límite
-        Servicio->>Inscripcion: preinscribir(datos, costo, fecha límite)
-        Servicio->>UoW: guardar Inscripción, Expediente y Grupo
-        UoW-->>Servicio: commit
+        Grupo-->>Servicio: reserva y fechaLimitePago
+        Servicio->>Inscripcion: preinscribir(datos, costo, fechaLimitePago)
+        Servicio->>UoW: guardar Inscripcion, Expediente y Grupo
+        Servicio->>UoW: confirmar transaccion
         Servicio-->>API: SolicitudRegistrada (Preinscrito)
-        API-->>Estudiante: 201 — Inscripción Preinscrita
-        Contable->>API: POST /inscripciones/{id}/pagos
-        API->>Contable: pagoNotificado(id, monto, fecha)
-        Contable->>Servicio: acreditarPago(id, monto, fecha)
-        Servicio->>Inscripcion: registrarPago(PagoAcreditado)
-        alt Pago acumulado >= 50%
-            Inscripcion-->>Servicio: formalización + folio único
-        else Pago menor a 50%
-            Inscripcion-->>Servicio: abono; permanece Preinscrito
-        end
-        Servicio->>UoW: guardar Inscripción y commit
-        API-->>Contable: estado actualizado + mensaje
-    else Sin cupo
-        Grupo->>Grupo: agregarAListaDeEspera(estudiante, fecha/hora)
-        Servicio->>UoW: guardar Grupo y commit
+        API-->>Estudiante: 201 Created, estado Preinscrito
+    else No hay cupo
+        Servicio->>Grupo: agregarAListaDeEspera(estudianteId, fechaHora)
+        Servicio->>UoW: guardar Grupo y confirmar transaccion
         Servicio-->>API: EnListaDeEspera
-        API-->>Estudiante: 202 — En lista de espera
+        API-->>Estudiante: 202 Accepted, lista de espera
+    end
+
+    opt Cuando el sistema contable acredita un pago
+        Contable->>API: POST /inscripciones/{inscripcionId}/pagos
+        API->>Adapter: pagoNotificado(inscripcionId, monto, fecha)
+        Adapter->>Servicio: acreditarPago(inscripcionId, monto, fecha)
+        Servicio->>UoW: iniciar transaccion
+        Servicio->>Inscripcion: registrarPago(PagoAcreditado)
+        alt Pago acumulado alcanza el 50 por ciento
+            Inscripcion-->>Servicio: InscripcionFormalizada con folio
+        else Pago acumulado menor al 50 por ciento
+            Inscripcion-->>Servicio: abono registrado; estado Preinscrito
+        end
+        Servicio->>UoW: guardar Inscripcion y confirmar transaccion
+        Servicio-->>Adapter: resultado de acreditacion
+        Adapter-->>API: resultado de pago
+        API-->>Contable: respuesta con estado de Inscripcion
     end
 ```
 
-**Límites del diagrama:** no representa una integración bancaria real ni una notificación LMS; el repositorio modela el adaptador contable y expone la operación de pago. La formalización requiere las condiciones de negocio del dominio, incluido el pago acreditado.
+## Correspondencia con el repositorio
+
+- `POST /grupos/{grupoId}/inscripciones`: `src/api/main.py`, operación `inscribir`.
+- `InscripcionService.solicitarInscripcion`: `src/application/inscripcion_service.py`; reserva lugar, crea la preinscripción y registra la lista de espera cuando no hay cupo.
+- `POST /inscripciones/{inscripcionId}/pagos`: `src/api/main.py`, operación `pagar`.
+- `SistemaContableAdapter.pagoNotificado`: `src/infrastructure/adapters.py`; delega en `InscripcionService.acreditarPago`.
+- `Inscripcion.registrarPago`: `src/domain/inscripcion.py`; determina si el pago acumulado formaliza la inscripción y genera el folio.
+
+**Límite:** el repositorio contiene un adaptador que modela la notificación del sistema contable, pero no acredita una conexión real con un proveedor contable externo. El diagrama no representa una pasarela bancaria ni una integración real de terceros.
