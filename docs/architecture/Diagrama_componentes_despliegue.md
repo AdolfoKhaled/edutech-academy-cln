@@ -25,7 +25,7 @@ flowchart LR
     end
 ```
 
-## Despliegue local y despliegue configurado
+## Despliegue local y en producción
 
 ```mermaid
 flowchart TB
@@ -38,12 +38,12 @@ flowchart TB
         APPLOCAL --> PGLOCAL
     end
 
-    subgraph Nube[Despliegue configurado en Render]
+    subgraph Nube[Producción en Render]
         GH[Repositorio GitHub] -->|configuracion de despliegue| RENDER[Render Web Service - Dockerfile]
         RENDER -->|DATABASE_URL| PGRENDER[(Render PostgreSQL)]
     end
 
-    CI[GitHub Actions - lint y pruebas] -.->|validacion automatizada| GH
+    CI[GitHub Actions - lint, pruebas, Docker y despliegue] -.->|push a main| RENDER
 ```
 
 ## Responsabilidades y límites
@@ -55,4 +55,4 @@ flowchart TB
 - **Persistencia:** PostgreSQL está configurado para Docker Compose y Render mediante `DATABASE_URL`. SQLite se utiliza en pruebas y puede configurarse para desarrollo.
 - **Sistema contable:** `SistemaContableAdapter` está implementado como adaptador de aplicación; el repositorio no demuestra conexión real con un proveedor externo.
 - **LMS:** existe un `LmsAdapter` en el código, pero el repositorio no acredita una conexión real con una plataforma LMS.
-- **Render:** `render.yaml` describe la configuración del servicio y la base de datos. Su presencia no demuestra que el despliegue esté activo o saludable.
+- **Render:** `render.yaml` crea el servicio web y la base PostgreSQL. El sistema está desplegado en https://edutech-academy-api.onrender.com (panel en `/panel`, Swagger en `/docs`, salud en `/salud`).
