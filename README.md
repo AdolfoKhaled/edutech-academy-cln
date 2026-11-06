@@ -6,7 +6,7 @@ Sistema de inscripciones, asistencia, calificaciones, actas y certificados de **
 **Curso:** Componentes de Lógica de Negocio · FIME, UANL · Profesor Miguel Ángel Gómez Marroquín
 
 - Repositorio: https://github.com/AdolfoKhaled/edutech-academy-cln
-- Sistema desplegado (Swagger): **_pendiente: URL de Render_**/docs
+- Sistema desplegado (Swagger): (https://edutech-academy-api.onrender.com/docs)
 
 ## Estructura
 
