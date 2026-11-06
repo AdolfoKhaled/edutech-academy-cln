@@ -2065,6 +2065,13 @@
             "type": "array",
             "title": "Motivos"
           },
+          "explicacion": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Explicacion"
+          },
           "beneficioReferencia": {
             "type": "boolean",
             "title": "Beneficioreferencia"
@@ -2086,6 +2093,7 @@
           "solicitudId",
           "puedeProcesarse",
           "motivos",
+          "explicacion",
           "beneficioReferencia",
           "total",
           "reglas"
