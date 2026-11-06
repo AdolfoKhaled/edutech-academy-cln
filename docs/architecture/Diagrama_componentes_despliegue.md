@@ -1,46 +1,58 @@
 # Diagrama de componentes y despliegue — EduTech Academy
 
-**Vista:** componentes lógicos y despliegue reproducible descrito por los archivos `Dockerfile`, `docker-compose.yml`, `render.yaml` y `src/`. Se muestran PostgreSQL/SQLite como opciones de persistencia configurables.
+**Vista:** arquitectura lógica y opciones de despliegue descritas por `src/`, `Dockerfile`, `docker-compose.yml` y `render.yaml`. El diagrama separa los componentes de la aplicación de los entornos donde puede ejecutarse.
 
-```mermaid
-flowchart TB
-    U[Estudiante / Instructor / Control Escolar / Coordinación] -->|HTTP + JSON| API[FastAPI\n src/api\n endpoints + DTO + OpenAPI]
-    API --> APP[Aplicación\n src/application\n servicios + casos de uso + puertos]
-    APP --> DOM[Dominio\n src/domain\n entidades + reglas + especificaciones + eventos]
-    APP --> INFRA[Infraestructura\n src/infrastructure\n SQLAlchemy + repositorios + Unit of Work + adapters]
-    INFRA --> DB[(PostgreSQL\n despliegue / Docker Compose)]
-    INFRA -. configuración alternativa .-> SQLITE[(SQLite\n pruebas / desarrollo)]
-    CSV[Paquete de datos CSV\n datos/] --> INFRA
-    CONT[ Sistema contable externo ] -. notificación de pago vía adapter .-> INFRA
-    LMS[ LMS / videoconferencia ] -. integración real no acreditada .-> APP
-
-    subgraph Contenedor de aplicación
-      API
-      APP
-      DOM
-      INFRA
-    end
-```
-
-## Despliegue contemplado
+## Componentes lógicos
 
 ```mermaid
 flowchart LR
-    G[Repositorio GitHub] --> CI[GitHub Actions\n lint + pruebas + build] --> IMG[Imagen Docker]
-    IMG --> R[Render Web Service]
-    R --> PG[(Render PostgreSQL)]
-    DEV[Entorno local] --> DC[Docker Compose] --> PGLOCAL[(PostgreSQL 16)]
-    DC --> APPLOCAL[Contenedor FastAPI :8000]
-    PGLOCAL --> APPLOCAL
+    Usuario[Estudiante, Instructor y personal escolar] -->|HTTP y JSON| API[API REST - FastAPI]
+    API -->|invoca casos de uso| APP[Aplicacion - servicios]
+    APP -->|usa reglas y entidades| DOM[Dominio - entidades e invariantes]
+    APP -->|puertos y transacciones| INFRA[Infraestructura - repositorios y adaptadores]
+    INFRA -->|persistencia| DB[(Base de datos)]
+    CSV[Archivos CSV en datos/] -->|carga inicial| INFRA
+    Contable[Sistema contable externo] -->|notificacion modelada| ADAPTER[ SistemaContableAdapter ]
+    ADAPTER -->|acredita pago| APP
+    LMS[LMS externo] -.->|adaptador definido; conexion real no acreditada| INFRA
+
+    subgraph Aplicacion EduTech
+        API
+        APP
+        DOM
+        INFRA
+        ADAPTER
+    end
+```
+
+## Despliegue local y despliegue configurado
+
+```mermaid
+flowchart TB
+    subgraph Local[Entorno local]
+        DC[Docker Compose]
+        APPLOCAL[Contenedor FastAPI - puerto 8000]
+        PGLOCAL[(PostgreSQL 16)]
+        DC --> APPLOCAL
+        DC --> PGLOCAL
+        APPLOCAL --> PGLOCAL
+    end
+
+    subgraph Nube[Despliegue configurado en Render]
+        GH[Repositorio GitHub] -->|configuracion de despliegue| RENDER[Render Web Service - Dockerfile]
+        RENDER -->|DATABASE_URL| PGRENDER[(Render PostgreSQL)]
+    end
+
+    CI[GitHub Actions - lint y pruebas] -.->|validacion automatizada| GH
 ```
 
 ## Responsabilidades y límites
 
-- **API:** traduce solicitudes HTTP a operaciones de aplicación y publica OpenAPI/Swagger.
-- **Aplicación:** coordina casos de uso, transacciones y puertos; no concentra las reglas centrales del negocio.
-- **Dominio:** contiene entidades, objetos de valor, invariantes, especificaciones y eventos.
-- **Infraestructura:** implementa persistencia, carga CSV y adaptadores externos.
-- **Persistencia:** PostgreSQL se usa en Docker/Render según configuración; SQLite está contemplado para pruebas y desarrollo.
-- **Integraciones externas:** el código incluye un adaptador contable simulado/modelado; no se debe afirmar que existe conexión real con un proveedor contable o LMS.
-
-**Nota:** Render aparece configurado en el repositorio; la existencia de `render.yaml` no demuestra por sí sola que el despliegue esté activo o saludable.
+- **API (`src/api/`):** expone endpoints HTTP, valida DTO y publica OpenAPI.
+- **Aplicación (`src/application/`):** coordina casos de uso, servicios, puertos y transacciones.
+- **Dominio (`src/domain/`):** contiene entidades, objetos de valor, reglas, especificaciones y eventos.
+- **Infraestructura (`src/infrastructure/`):** implementa persistencia, repositorios, carga CSV y adaptadores.
+- **Persistencia:** PostgreSQL está configurado para Docker Compose y Render mediante `DATABASE_URL`. SQLite se utiliza en pruebas y puede configurarse para desarrollo.
+- **Sistema contable:** `SistemaContableAdapter` está implementado como adaptador de aplicación; el repositorio no demuestra conexión real con un proveedor externo.
+- **LMS:** existe un `LmsAdapter` en el código, pero el repositorio no acredita una conexión real con una plataforma LMS.
+- **Render:** `render.yaml` describe la configuración del servicio y la base de datos. Su presencia no demuestra que el despliegue esté activo o saludable.
